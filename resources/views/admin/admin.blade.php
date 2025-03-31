@@ -16,7 +16,7 @@
         <nav class="flex-1 p-4 space-y-2">
             <a href="{{ route('admin') }}" class="block py-2 px-4 rounded hover:bg-green-700 {{ request()->routeIs('admin') ? 'bg-green-700' : '' }}">Dashboard</a>
             <a href="{{ route('admin.users') }}" class="block py-2 px-4 rounded hover:bg-green-700 {{ request()->routeIs('admin.users') ? 'bg-green-700' : '' }}">Tài khoản</a>
-            <a href="#" class="block py-2 px-4 rounded hover:bg-green-700">Chatbot</a>
+            <a href="{{ route('admin.chatbot') }}" class="block py-2 px-4 rounded hover:bg-green-700 {{ request()->routeIs('admin.chatbot') ? 'bg-green-700' : '' }}">Chatbot</a>
             <a href="#" class="block py-2 px-4 rounded hover:bg-green-700">Cài đặt</a>
         </nav>
         <form method="POST" action="{{ route('logout') }}" class="p-4 border-t border-green-500">

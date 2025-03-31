@@ -54,4 +54,9 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
-}
+    public function chatbotLogs()
+    {
+        return $this->hasMany(ChatbotLog::class);
+    }
+
+}   

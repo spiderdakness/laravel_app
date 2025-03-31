@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\ChatbotLog;
+
 
 class AuthController extends Controller
 {
@@ -26,15 +28,11 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
     
-            // ✅ Ghi lại thời gian đăng nhập
-            Auth::user()->update([
-                'last_login_at' => now()
-            ]);
-    
-            if (Auth::id() == 1) {
+            // 👉 Kiểm tra role thay vì ID
+            if (Auth::user()->role === 'admin') {
                 return redirect()->intended('/admin');
             } else {
-                return redirect()->intended('/');
+                return redirect()->intended('/dashboard');
             }
         }
     
@@ -42,6 +40,7 @@ class AuthController extends Controller
             'email' => 'Thông tin đăng nhập không chính xác.',
         ])->onlyInput('email');
     }
+    
     
     // Show Register form
     public function showRegistrationForm()
@@ -97,7 +96,12 @@ class AuthController extends Controller
             
             if ($response->successful()) {
                 $data = $response->json();
-    
+                
+            // Ghi log chatbot
+                 ChatbotLog::create([
+                'user_id' => auth()->id(),
+                'question' => $question,
+            ]);
                 // ✅ Trả về đúng format bạn cần
                 return response()->json([
                     'question' => $question,
@@ -130,7 +134,7 @@ class AuthController extends Controller
     
         return view('admin.admin', compact('userCount'));
     }
-    
+    //hiển thị danh dách người dung
     public function showUsers()
     {
         $users = \App\Models\User::whereNotNull('last_login_at')
@@ -139,6 +143,5 @@ class AuthController extends Controller
     
         return view('admin.admin_users', compact('users'));
     }
-
 
 }

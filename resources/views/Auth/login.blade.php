@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <title>Đăng nhập - Chatbot Phật Giáo</title>
@@ -24,25 +24,33 @@
         <h2 class="text-3xl font-bold text-center mb-6">Đăng nhập Chatbot Phật Giáo</h2>
 
         <!-- Thông báo lỗi -->
-        @if (session('error'))
+        @if ($errors->any())
             <div class="mb-4 bg-red-500 bg-opacity-70 text-white p-2 rounded">
-                {{ session('error') }}
+                @foreach ($errors->all() as $error)
+                    <p>{{ $error }}</p>
+                @endforeach
             </div>
         @endif
 
-        <!-- Form login -->
+        <!-- Form đăng nhập -->
         <form method="POST" action="{{ route('login') }}">
             @csrf
             <div class="mb-4">
                 <label for="email" class="block text-sm font-medium mb-1">Email</label>
-                <input type="email" name="email" id="email" required
+                <input type="email" name="email" id="email" value="{{ old('email') }}" required
                        class="w-full px-4 py-2 rounded bg-white/80 text-black focus:outline-none focus:ring-2 focus:ring-green-400">
+                @error('email')
+                    <p class="text-red-300 text-sm mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
             <div class="mb-4">
                 <label for="password" class="block text-sm font-medium mb-1">Mật khẩu</label>
                 <input type="password" name="password" id="password" required
                        class="w-full px-4 py-2 rounded bg-white/80 text-black focus:outline-none focus:ring-2 focus:ring-green-400">
+                @error('password')
+                    <p class="text-red-300 text-sm mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
             <button type="submit"
