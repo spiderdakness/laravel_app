@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
@@ -53,10 +54,4 @@ class User extends Authenticatable
     {
         return $this->role === 'admin';
     }
-
-    public function chatbotLogs()
-    {
-        return $this->hasMany(ChatbotLog::class);
-    }
-
 }   

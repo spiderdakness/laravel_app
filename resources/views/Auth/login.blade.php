@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Đăng nhập - Chatbot Phật Giáo</title>
@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e');
+            background-image: url('https://cdn.pixabay.com/photo/2016/07/17/06/57/lotus-1523281_1280.jpg');
             background-size: cover;
             background-position: center;
         }
@@ -24,33 +24,25 @@
         <h2 class="text-3xl font-bold text-center mb-6">Đăng nhập Chatbot Phật Giáo</h2>
 
         <!-- Thông báo lỗi -->
-        @if ($errors->any())
+        @if (session('error'))
             <div class="mb-4 bg-red-500 bg-opacity-70 text-white p-2 rounded">
-                @foreach ($errors->all() as $error)
-                    <p>{{ $error }}</p>
-                @endforeach
+                {{ session('error') }}
             </div>
         @endif
 
-        <!-- Form đăng nhập -->
+        <!-- Form login -->
         <form method="POST" action="{{ route('login') }}">
             @csrf
             <div class="mb-4">
                 <label for="email" class="block text-sm font-medium mb-1">Email</label>
-                <input type="email" name="email" id="email" value="{{ old('email') }}" required
+                <input type="email" name="email" id="email" required
                        class="w-full px-4 py-2 rounded bg-white/80 text-black focus:outline-none focus:ring-2 focus:ring-green-400">
-                @error('email')
-                    <p class="text-red-300 text-sm mt-1">{{ $message }}</p>
-                @enderror
             </div>
 
             <div class="mb-4">
                 <label for="password" class="block text-sm font-medium mb-1">Mật khẩu</label>
                 <input type="password" name="password" id="password" required
                        class="w-full px-4 py-2 rounded bg-white/80 text-black focus:outline-none focus:ring-2 focus:ring-green-400">
-                @error('password')
-                    <p class="text-red-300 text-sm mt-1">{{ $message }}</p>
-                @enderror
             </div>
 
             <button type="submit"

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Admin\ChatbotLogController;
+use App\Http\Controllers\Admin\DashboardController;
 
 Route::get('/', function () {
     return view('dashboard');
@@ -25,7 +25,9 @@ Route::get('/dashboard', function () {
 
 Route::get('/admin_users', [AuthController::class, 'showUsers'])->middleware('auth')->name('admin.users');
 
-Route::post('/chatbot/ask', [AuthController::class, 'ask'])->name('chatbot.ask');
+//Route::post('/chatbot/ask', [AuthController::class, 'ask'])->name('chatbot.ask');
+Route::post('/chatbot/ask', [AuthController::class, 'ask']) ->middleware('auth') ->name('chatbot.ask');
+
 
 //Route::get('/index', [AuthController::class, 'showUsers'])->middleware('auth')->name('admin.index');
 
@@ -38,15 +40,9 @@ Route::prefix('admin_users')->middleware('auth')->group(function () {
     Route::delete('/{id}', [UserController::class, 'destroy'])->name('admin.users.destroy');
 });
 
-//đăng nhập admin
-Route::get('/admin', function () {
-    // Kiểm tra quyền nếu chưa dùng middleware
-    if (!auth()->check() || auth()->user()->role !== 'admin') {
-        abort(403, 'Bạn không có quyền truy cập trang admin.');
-    }
-    return view('admin.admin');
-})->middleware('auth')->name('admin'); // ← Đặt tên route ở đây
+//của chat bot
+// Route::get('/admin/chatbot', [ChatbotLogController::class, 'index'])->middleware('auth')->name('admin.chatbot');
 
-Route::get('/admin/chatbot', [ChatbotLogController::class, 'index'])
-    ->middleware(['auth'])
-    ->name('admin.chatbot');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin', [DashboardController::class, 'index'])->name('admin');
+});

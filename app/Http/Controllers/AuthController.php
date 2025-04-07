@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
-use App\Models\ChatbotLog;
+
 
 
 class AuthController extends Controller
@@ -27,7 +27,12 @@ class AuthController extends Controller
     
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-    
+
+                // ✅ Cập nhật thời gian đăng nhập
+            Auth::user()->update([
+                'last_login_at' => now()
+            ]);
+
             // 👉 Kiểm tra role thay vì ID
             if (Auth::user()->role === 'admin') {
                 return redirect()->intended('/admin');
@@ -89,37 +94,36 @@ class AuthController extends Controller
         $question = $request->input('question');
     
         try {
-            // Gọi API lấy answer
-            $response = Http::post('http://127.0.0.1:8000/chatbot/ask', [
+            // ✅ Gọi API tại cổng 8000 (FastAPI hoặc API AI bên ngoài)
+            $response = Http::timeout(5)->post('http://127.0.0.1:8000/chatbot/ask', [
                 'question' => $question
             ]);
-            
+    
             if ($response->successful()) {
                 $data = $response->json();
-                
-            // Ghi log chatbot
-                 ChatbotLog::create([
-                'user_id' => auth()->id(),
-                'question' => $question,
-            ]);
-                // ✅ Trả về đúng format bạn cần
+            
+            //     // ✅ Ghi lại log nếu người dùng đang đăng nhập
+            // if (Auth::check()) {
+            //     ChatbotLog::create([
+            //         'user_id' => Auth::id(),
+            //         'question' => $question
+            //     ]);
+            // }
                 return response()->json([
                     'question' => $question,
                     'answer' => $data['answer']
                 ]);
-            }
+            }            
     
-            // Nếu không thành công
             return response()->json([
                 'question' => $question,
                 'answer' => '🚫 API không phản hồi thành công (mã ' . $response->status() . ')'
             ], 500);
     
         } catch (\Exception $e) {
-            // Trường hợp lỗi hệ thống
             return response()->json([
                 'question' => $question,
-                'answer' => '🚫 Lỗi hệ thống khi gọi API: ' . $e->getMessage()
+                'answer' => '🚫 Không thể kết nối API: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -136,12 +140,9 @@ class AuthController extends Controller
     }
     //hiển thị danh dách người dung
     public function showUsers()
-    {
-        $users = \App\Models\User::whereNotNull('last_login_at')
-                    ->orderByDesc('last_login_at')
-                    ->get();
-    
-        return view('admin.admin_users', compact('users'));
+    { 
+        
+        $users = User::orderBy('last_login_at', 'desc')->get();
+            return view('admin.users.index', compact('users'));   
     }
-
 }

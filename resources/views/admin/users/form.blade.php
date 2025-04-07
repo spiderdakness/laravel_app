@@ -1,69 +1,130 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ $editMode ? 'Sửa tài khoản' : 'Thêm tài khoản' }}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="min-h-screen flex items-center justify-center px-4 bg-cover bg-center"
-      style="background-image: url('https://img.freepik.com/free-photo/beautiful-tropical-empty-beach-sea-ocean-with-white-cloud-blue-sky-background_74190-13665.jpg?t=st=1743386643~exp=1743390243~hmac=cd1c8328ab8e1f7351da46e2995a8c704d916a2ae4d90e5cf7c696806b4c159f&w=1380');">
+@extends('admin.admin')
 
-    <div class="bg-white/40 backdrop-blur-md w-full max-w-lg p-8 rounded-2xl shadow-lg border border-white/30">
-        <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">
+@section('content')
+<div class="flex flex-col h-full">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">
             {{ $editMode ? 'Sửa tài khoản' : 'Thêm tài khoản' }}
         </h2>
+        <a href="{{ route('admin.users') }}" class="btn-secondary">
+            <i class="fas fa-arrow-left mr-2"></i> Quay lại
+        </a>
+    </div>
 
-        <form method="POST"
-              action="{{ $editMode ? route('admin.users.update', $user->id) : route('admin.users.store') }}">
+    <!-- Form Container -->
+    <div class="card flex-1">
+        <form method="POST" 
+              action="{{ $editMode ? route('admin.users.update', $user->id) : route('admin.users.store') }}"
+              class="space-y-5 p-6">
             @csrf
             @if($editMode)
                 @method('PUT')
             @endif
 
-            <!-- Tên -->
-            <div class="mb-4">
-                <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Tên</label>
-                <input type="text" name="name" id="name" value="{{ old('name', $user->name ?? '') }}" required
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
-            </div>
-
-            <!-- Email -->
-            <div class="mb-4">
-                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <input type="email" name="email" id="email" value="{{ old('email', $user->email ?? '') }}" required
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
-            </div>
-
-            <!-- Mật khẩu -->
-            <div class="mb-4">
-                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">
-                    Mật khẩu {{ $editMode ? '(bỏ trống nếu không đổi)' : '' }}
+            <!-- Name Field -->
+            <div>
+                <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
+                    Tên người dùng <span class="text-red-500">*</span>
                 </label>
-                <input type="password" name="password"
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                       {{ $editMode ? '' : 'required' }}>
+                <input type="text" name="name" id="name" 
+                       value="{{ old('name', $user->name ?? '') }}"
+                       required
+                       class="input-field w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+                @error('name')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
             </div>
 
-            <!-- Vai trò -->
-            <div class="mb-6">
-                <label for="role" class="block text-sm font-medium text-gray-700 mb-1">Vai trò</label>
-                <select name="role" id="role"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        required>
-                    <option value="user" {{ old('role', $user->role ?? '') === 'user' ? 'selected' : '' }}>User</option>
-                    <option value="admin" {{ old('role', $user->role ?? '') === 'admin' ? 'selected' : '' }}>Admin</option>
+            <!-- Email Field -->
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+                    Email <span class="text-red-500">*</span>
+                </label>
+                <input type="email" name="email" id="email" 
+                       value="{{ old('email', $user->email ?? '') }}"
+                       required
+                       class="input-field w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+                @error('email')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <!-- Password Field -->
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">
+                    Mật khẩu {{ $editMode ? '(để trống nếu không đổi)' : '' }}
+                    @if(!$editMode)<span class="text-red-500">*</span>@endif
+                </label>
+                <input type="password" name="password" id="password"
+                       {{ $editMode ? '' : 'required' }}
+                       class="input-field w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+                @error('password')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <!-- Role Field -->
+            <div>
+                <label for="role" class="block text-sm font-medium text-gray-700 mb-1">
+                    Vai trò <span class="text-red-500">*</span>
+                </label>
+                <select name="role" id="role" required
+                        class="input-field w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    <option value="user" {{ old('role', $user->role ?? '') === 'user' ? 'selected' : '' }}>Người dùng</option>
+                    <option value="admin" {{ old('role', $user->role ?? '') === 'admin' ? 'selected' : '' }}>Quản trị viên</option>
                 </select>
             </div>
 
-            <div class="flex justify-between items-center">
-                <a href="{{ route('admin.users') }}" class="text-gray-700 hover:underline">⬅ Quay lại</a>
-                <button type="submit"
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold shadow">
+            <!-- Status Field (for edit mode) -->
+            @if($editMode)
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Trạng thái</label>
+                <div class="flex items-center space-x-4">
+                    <label class="inline-flex items-center">
+                        <input type="radio" name="is_active" value="1" 
+                               {{ old('is_active', $user->is_active ?? 1) ? 'checked' : '' }}
+                               class="h-4 w-4 text-blue-600 focus:ring-blue-500">
+                        <span class="ml-2 text-gray-700">Hoạt động</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="radio" name="is_active" value="0"
+                               {{ !old('is_active', $user->is_active ?? 1) ? 'checked' : '' }}
+                               class="h-4 w-4 text-blue-600 focus:ring-blue-500">
+                        <span class="ml-2 text-gray-700">Không hoạt động</span>
+                    </label>
+                </div>
+            </div>
+            @endif
+
+            <!-- Form Actions -->
+            <div class="flex justify-end pt-4">
+                <button type="submit" 
+                        class="btn-primary">
+                    <i class="fas {{ $editMode ? 'fa-save' : 'fa-plus' }} mr-2"></i>
                     {{ $editMode ? 'Cập nhật' : 'Thêm mới' }}
                 </button>
             </div>
         </form>
     </div>
+</div>
 
-</body>
-</html>
+<!-- Custom Styles -->
+<style>
+    .card {
+        @apply bg-white rounded-lg shadow-sm border border-gray-200;
+    }
+    
+    .btn-primary {
+        @apply inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition;
+    }
+    
+    .btn-secondary {
+        @apply inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition;
+    }
+    
+    .input-field {
+        @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50;
+    }
+</style>
+@endsection

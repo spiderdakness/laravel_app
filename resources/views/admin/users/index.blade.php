@@ -1,6 +1,8 @@
 @extends('admin.admin')
 
 @section('content')
+@section('stats-cards')
+@stop
 <h2 class="text-2xl font-bold mb-4">Tài khoản đã đăng nhập gần đây</h2>
 
 <!-- Thông báo thành công -->
